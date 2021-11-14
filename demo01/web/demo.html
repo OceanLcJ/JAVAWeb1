@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jQuery</title>
+    <!-- 引入 jQuery -->
+    <script src="./js/jquery-1.11.3.min.js"></script>
+</head>
+<body>
+<input type="text" id="test">test</input>
+// 将绑定事件方法的script标签放到body的末尾
+<script type="text/javascript">
+    $("#test").blur(function () {
+        alert("test2");
+    });
+</script>
+</body>
+</html>

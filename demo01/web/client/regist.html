@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册页面</title>
+    <script src="../js/jquery-1.11.3.min.js"></script>
+    <style>
+        span{
+            font-size: xx-small;
+        }
+        input::-webkit-input-placeholder {
+            /* placeholder颜色  */
+            color: #aab2bd;
+            /* placeholder字体大小  */
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<h1>注册页面</h1>
+<form method="get" action="./user.do">
+    <input type="hidden" name="action" value="register">
+    <input type="hidden" name="flag" id="flag" value="false">
+    会员邮箱:<input type="text" name="email" id="email"  /><span id="eamil_msg"></span><br/>
+    会员名称:<input type="text" name="username" id="username" placeholder="请输入4-20位的用户名" /><span id="username_msg"></span><br/>
+    会员密码:<input type="password" name="password" id="password"/><span id="password_msg"></span><br/>
+    重复密码:<input type="password" name="cpassword" id="cpassword"/><span id="cpassword_msg"></span><br/>
+    联系电话:<input type="text" name="telephone" id="telephone"/><span id="tel_msg"></span><br/>
+    性别:<input type="radio" name="gender" id="gender" value="male" checked="checked">男
+    <input type="radio" name="gender" value="female" >女<br/>
+    个人介绍:<textarea name="introduce" id="introduce"></textarea><br/>
+    <button type="submit">提交</button>
+    <button type="reset">重置</button>
+    <button type="button">返回</button>
+</form>
+<script type="text/javascript">
+    //1.会员邮箱格式校验
+    //2.密码和重复密码相同校验
+    //3.电话格式校验
+    //4.性别单选框
+    //5.所有属性都要非空
+    //6.用户名、密码4-20位
+    var username_flag = false;
+    var password_flag = false;
+    var cpassword_flag = false;
+    var email_flag = false;
+    var tel_flag = false;
+    //是否为空
+    function ifnull(txt) {
+        if (txt.length == 0 || txt == 'null'){
+            return true;
+        }
+        var $reg=/\s+/;
+        return $reg.test(txt);
+    }
+    //email是否合格
+    $("#email").blur(function () {
+        if (ifnull($(this).val())){
+            $("#eamil_msg").html("邮箱不能空").css("color","red");
+        }else{
+            var $reg = /^\w+((-\w+)|(\.\w+))*@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/;
+            if (!$reg.test($("#email").val())){
+                $("#eamil_msg").html("邮箱格式错误").css("color","red");
+            }else{
+                $("#eamil_msg").html("yes").css("color","green");
+                email_flag = true;
+            }
+        }
+    });
+    //username是否合格
+    $("#username").blur(function () {
+        var usernameText = $(this).val().trim();
+        if (ifnull(usernameText)){
+            $("#username_msg").html("用户名不能空").css("color","red");
+        }else {
+            var $reg=/^\w{4,20}$/;
+            if ($reg.test(usernameText)){
+                $.ajax({
+                    url:("./user.do"),
+                    data:{username:usernameText,action:'isExists'},
+                    type:"GET",
+                    success:function (data) {
+                        if (data){
+                            $("#username_msg").html("用户名已注册").css("color","red");
+                        }
+                        else {
+                            $("#username_msg").html("yes").css("color","green");
+                            username_flag = true;
+                        }
+                    }
+                });
+            }else{
+                $("#username_msg").html("用户名为4-20位").css("color","red");
+            }
+        }
+    });
+    //判断密码是否合格
+    $("#password").blur(function () {
+        if (ifnull($(this).val())){
+            $("#password_msg").html("密码不能空").css("color","red");
+        }else {
+            var $reg=/^\w{4,20}$/;
+            if ($reg.test($(this).val())){
+                $("#password_msg").html("yes").css("color","green");
+                password_flag = true;
+            }else{
+                $("#password_msg").html("密码为4-20位").css("color","red");
+            }
+        }
+    });
+    //判断重复密码是否合格
+    $("#cpassword").blur(function () {
+        if (ifnull($(this).val())){
+            $("#cpassword_msg").html("密码不能空").css("color","red");
+        }else {
+            var $reg=/^\w{4,20}$/;
+            if (($reg.test($(this).val())) && ($("#password").val() == $(this).val())){
+                $("#cpassword_msg").html("yes").css("color","green");
+                cpassword_flag = true;
+            }else if($("#password").val() != $(this).val()){
+                $("#cpassword_msg").html("两次密码不一致").css("color","red");
+            }else{
+                $("#cpassword_msg").html("密码为4-20位").css("color","red");
+            }
+
+        }
+    });
+    //判断电话号码是否合格
+    $("#telephone").blur(function () {
+        if (ifnull($(this).val())){
+            $("#tel_msg").html("电话号码不能为空").css("color","red");
+        }else {
+            var $reg= /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
+            if ($reg.test($(this).val())){
+                $("#tel_msg").html("yes").css("color","green");
+                tel_flag = true;
+            }else{
+                $("#tel_msg").html("电话号码格式错误").css("color","red");
+            }
+        }
+    });
+
+    //表单提交验证
+    $("form").submit(function () {
+        if (username_flag && password_flag && cpassword_flag && email_flag && tel_flag){
+            $("#flag").val("true");
+            alert("注册成功");
+        }else{
+            alert("注册失败，请认真填写！ ");
+        }
+    });
+</script>
+</body>
+</html>
